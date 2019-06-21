@@ -15,8 +15,11 @@ ControlSocket("TCP", 7777);
 
 ers :: EmpowerRXStats(EL el);
 
+el_latency_info :: EmpowerLatencyInfo(EL el, DEBUG false);
+
 wifi_cl :: Classifier(0/08%0c,  // data
-                      0/00%0c); // mgt
+                      0/00%0c,  // mgt
+                      0/04%0c); // ctrl
 
 ers -> wifi_cl;
 
@@ -41,6 +44,7 @@ FromDevice(moni0, PROMISC false, OUTBOUND true, SNIFFER false, BURST 1000)
 
 sched_0 :: PrioSched()
   -> WifiSeq()
+  -> empower_wifi_info_handler :: EmpowerWifiInfoHandler(EL el, EL_LATENCY_INFO el_latency_info, DEBUG false)
   -> [1] rc_0 [1]
   -> RadiotapEncap()
   -> ToDevice (moni0);
@@ -80,6 +84,7 @@ ctrl :: Socket(TCP, 192.168.1.5, 4433, CLIENT true, VERBOSE true, RECONNECT_CALL
   mtbl :: EmpowerMulticastTable(DEBUG false);
 
   wifi_cl [0]
+    -> empower_ack_handler :: EmpowerACKHandler(EL el, EL_LATENCY_INFO el_latency_info, MAX_SAMPLES 100, DEBUG false)
     -> wifi_decap :: EmpowerWifiDecap(EL el, DEBUG false)
     -> MarkIPHeader(14)
     -> igmp_cl :: IPClassifier(igmp, -);
@@ -128,4 +133,12 @@ ctrl :: Socket(TCP, 192.168.1.5, 4433, CLIENT true, VERBOSE true, RECONNECT_CALL
   mgt_cl [6]
     -> e11k :: Empower11k(EL el, DEBUG false)
     -> switch_mngt;
+
+  wifi_cl [2]
+    -> ctrl_cl :: Classifier(0/d0%f0); // ack
+
+  ctrl_cl [0]
+    -> PrintWifi(-5)
+    -> empower_ack_handler :: EmpowerACKHandler(EL el, EL_LATENCY_INFO el_latency_info, DEBUG $DEBUG_ACK_HANDLER)
+    -> Discard();
 
