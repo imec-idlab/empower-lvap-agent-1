@@ -237,11 +237,12 @@ public:
     uint32_t _tx_packets;
     uint32_t _tx_bytes;
     uint32_t _scheduler;
+    uint32_t _queue_delay; // in msec
 
     SliceQueue(Slice slice, uint32_t capacity, uint32_t quantum, bool amsdu_aggregation, uint32_t scheduler) :
 			_slice(slice), _capacity(capacity), _size(0), _drops(0), _deficit(0),
-			_quantum(quantum), _amsdu_aggregation(amsdu_aggregation), _max_aggr_length(7935),
-			_deficit_used(0), _max_queue_length(0), _tx_packets(0), _tx_bytes(0), _scheduler(scheduler) {
+			_quantum(quantum), _amsdu_aggregation(amsdu_aggregation), _max_aggr_length(7935),_deficit_used(0),
+			_max_queue_length(0), _tx_packets(0), _tx_bytes(0), _scheduler(scheduler), _queue_delay(0) {
 	}
 
 	~SliceQueue() {
@@ -415,6 +416,7 @@ private:
 
     ActiveNotifier _empty_note;
 	class EmpowerLVAPManager *_el;
+    class EmpowerQueueInfoBase *_el_queue_info;
 	class Minstrel * _rc;
 
 	Slices _slices;

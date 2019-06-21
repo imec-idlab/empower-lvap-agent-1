@@ -1,7 +1,8 @@
 /*
  * empowerqosmanager.{cc,hh} -- encapsultates 802.11 packets (EmPOWER Access Point)
- * John Bicket, Roberto Riggio
+ * John Bicket, Roberto Riggio, Pedro Heleno Isolani (@PHI)
  *
+ * Copyright (c) 2019 IDLAB - IMEC
  * Copyright (c) 2017 CREATE-NET
  * Copyright (c) 2004 Massachusetts Institute of Technology
  *
@@ -31,10 +32,11 @@
 #include <elements/wifi/minstrel.hh>
 #include <elements/wifi/bitrate.hh>
 #include "empowerlvapmanager.hh"
+#include "empowerqueueinfobase.hh"
 CLICK_DECLS
 
 EmpowerQOSManager::EmpowerQOSManager() :
-		_el(0), _rc(0), _sleepiness(0), _capacity(500), _quantum(1470), _iface_id(0), _debug(false) {
+		_el(0), _el_queue_info(0), _rc(0), _sleepiness(0), _capacity(500), _quantum(1470), _iface_id(0), _debug(false) {
 }
 
 EmpowerQOSManager::~EmpowerQOSManager() {
@@ -45,6 +47,7 @@ int EmpowerQOSManager::configure(Vector<String> &conf,
 
 	return Args(conf, this, errh)
 			.read_m("EL", ElementCastArg("EmpowerLVAPManager"), _el)
+            .read_m("EL_QUEUE_INFO", ElementCastArg("EmpowerQueueInfoBase"), _el_queue_info)
 			.read_m("RC", ElementCastArg("Minstrel"), _rc)
 			.read_m("IFACE_ID", _iface_id)
 			.read("QUANTUM", _quantum)
@@ -249,6 +252,15 @@ void EmpowerQOSManager::store(String ssid, int dscp, Packet *q, EtherAddress ra,
 	sliceq = _slices.get(slice);
 
 	if (sliceq->enqueue(q, ra, ta)) {
+
+        // Process packet enqueue for stats (@PHI)
+        Slice crr_slice = Slice(ssid, dscp);
+
+        if (_slices.find(crr_slice) != _slices.end()) {
+            _el_queue_info->process_packet_enqueue(dscp, Timestamp::now());
+        }
+        // end (@PHI)
+
 		// check if queue was empty and no packet in buffer
 		if (sliceq->size() == 1 && _head_table.find(slice).value() == 0) {
 			sliceq->_deficit = 0;
@@ -300,7 +312,14 @@ Packet * EmpowerQOSManager::pull(int) {
 		queue->_deficit_used += deficit;
 		queue->_tx_bytes += p->length();
 		queue->_tx_packets++;
-		if (queue->size() > 0) {
+
+		// Process packet dequeue (@PHI)
+		_el_queue_info->process_packet_dequeue(queue->_slice._dscp, Timestamp::now());
+
+		// Getting the current average delay for the slice (@PHI)
+        queue->_queue_delay = _el_queue_info->get_queue_delay(queue->_slice._dscp).msec();
+
+        if (queue->size() > 0) {
 			_active_list.push_front(slice);
 		}
 		_lock.release_write();

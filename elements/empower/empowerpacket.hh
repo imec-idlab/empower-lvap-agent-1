@@ -294,12 +294,12 @@ public:
 struct wifi_stats_entry {
   private:
       uint8_t  _type;       /* EtherAddress */
-      uint64_t _timestamp;  /* Timestamp in microseconds (int) */
+      uint32_t _timestamp;  /* Timestamp in microseconds (int) */
       uint32_t _sample;     /* Std RSSI during last window in dBm (int) */
   public:
     void set_type(uint8_t type)                         { _type = type; }
     void set_sample(uint32_t sample)                    { _sample = htonl(sample); }
-    void set_timestamp(uint64_t timestamp)              { _timestamp = htobe64(timestamp); }
+    void set_timestamp(uint32_t timestamp)              { _timestamp = htonl(timestamp); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* wifi stats response packet format */
@@ -859,6 +859,7 @@ struct empower_slice_queue_counters_response : public empower_header {
     uint32_t    _max_queue_length;  /* Maximum queue length reached */
     uint32_t	_tx_packets;        /* Int */
     uint32_t	_tx_bytes;          /* Int */
+    uint32_t	_queue_delay;       /* Int */
   public:
     void set_wtp(EtherAddress wtp)                          { memcpy(_wtp, wtp.data(), 6); }
     void set_counters_id(uint32_t counters_id)              { _counters_id = htonl(counters_id); }
@@ -866,6 +867,7 @@ struct empower_slice_queue_counters_response : public empower_header {
     void set_max_queue_length(uint32_t max_queue_length)    { _max_queue_length = htonl(max_queue_length); }
     void set_tx_packets(uint32_t tx_packets)    			{ _tx_packets = htonl(tx_packets); }
     void set_tx_bytes(uint32_t tx_bytes)    				{ _tx_bytes = htonl(tx_bytes); }
+    void set_queue_delay(uint32_t queue_delay)    			{ _queue_delay = htonl(queue_delay); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 CLICK_ENDDECLS

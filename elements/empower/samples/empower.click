@@ -15,6 +15,8 @@ ControlSocket("TCP", 7777);
 
 ers :: EmpowerRXStats(EL el);
 
+el_empower_queue_info_base :: EmpowerQueueInfoBase(EL el, DEBUG false)
+
 wifi_cl :: Classifier(0/08%0c,  // data
                       0/00%0c); // mgt
 
@@ -29,7 +31,7 @@ rates_default_0 :: TransmissionPolicy(MCS "2 4 11 22 12 18 24 36 48 72 96 108", 
 rates_0 :: TransmissionPolicies(DEFAULT rates_default_0);
 
 rc_0 :: RateControl(rates_0);
-eqm_0 :: EmpowerQOSManager(EL el, RC rc_0/rate_control, IFACE_ID 0, DEBUG false);
+eqm_0 :: EmpowerQOSManager(EL el, EL_QUEUE_INFO el_empower_queue_info_base, RC rc_0/rate_control, IFACE_ID 0, DEBUG false);
 
 FromDevice(moni0, PROMISC false, OUTBOUND true, SNIFFER false, BURST 1000)
   -> RadiotapDecap()
