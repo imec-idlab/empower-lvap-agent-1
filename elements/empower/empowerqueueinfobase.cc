@@ -72,7 +72,7 @@ void EmpowerQueueInfoBase::run_timer(Timer *){
     }
 
     // Computing the average deficit
-    for (DSCPDeficitPacketsMap::iterator i = dscp_deficit_packets_map.begin(); i!= dscp_dedicit_packets_map.end(); i++) {
+    for (DSCPDeficitPacketsMap::iterator i = dscp_deficit_packets_map.begin(); i!= dscp_deficit_packets_map.end(); i++) {
 
         int sum = 0;
         int avg = 0;
