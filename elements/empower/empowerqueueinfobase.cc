@@ -109,7 +109,7 @@ void EmpowerQueueInfoBase::process_packet_deficit(int dscp, int deficit) {
                       deficit);
     }
 
-    DSCPDeficitPacketsMap :: Pair * crr_dscp_deficit_pkts_pair = dscp_deficit_pkts_map.find_pair(dscp);
+    DSCPDeficitPacketsMap :: Pair * crr_dscp_deficit_pkts_pair = dscp_deficit_packets_map.find_pair(dscp);
 
     // if DSCP exists in deficit packets map
     if (crr_dscp_deficit_pkts_pair){
