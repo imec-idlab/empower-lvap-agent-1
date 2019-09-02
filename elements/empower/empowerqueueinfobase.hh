@@ -107,7 +107,12 @@ private:
     DSCPDelayPacketsMap dscp_delay_packets_map;
 
     /*
-     * Structure for holding last Deficits needed to transmit per DSCP (Slice)
+     * Structure for holding last transmitted packet deficits per DSCP (Slice)
+     */
+    DSCPDeficitPacketsMap dscp_deficit_packets_map;
+
+    /*
+     * Structure for holding last deficits needed to transmit per DSCP (Slice)
      */
     DSCPDeficitMap dscp_deficit_map;
 

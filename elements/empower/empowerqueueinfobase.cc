@@ -46,7 +46,7 @@ int EmpowerQueueInfoBase::configure(Vector<String> &conf,
 
 void EmpowerQueueInfoBase::run_timer(Timer *){
 
-    // Computing the average latency
+    // Computing the average queue delay
     for (DSCPDelayPacketsMap::iterator i = dscp_delay_packets_map.begin(); i!= dscp_delay_packets_map.end(); i++) {
 
         Timestamp sum = Timestamp();
@@ -71,6 +71,31 @@ void EmpowerQueueInfoBase::run_timer(Timer *){
         i.value().clear();
     }
 
+    // Computing the average deficit
+    for (DSCPDeficitPacketsMap::iterator i = dscp_deficit_packets_map.begin(); i!= dscp_dedicit_packets_map.end(); i++) {
+
+        int sum = 0;
+        int avg = 0;
+
+        // Iterate over the vector of computed delays
+        for (Vector<int>::const_iterator j = i.value().begin(); j!= i.value().end(); j++) {
+            sum += *j;
+        }
+
+        // If there was sum
+        if (sum){
+            avg = sum / i.value().size();
+        }
+
+        // Update the avg delay
+        dscp_deficit_map.insert(i.key(), avg);
+    }
+
+    // Reset deficit packets map
+    for (DSCPDeficitPacketsMap::iterator i = dscp_deficit_packets_map.begin(); i!= dscp_deficit_packets_map.end(); i++) {
+        i.value().clear();
+    }
+
     _timer.schedule_after_msec(_period);
 }
 
@@ -83,6 +108,39 @@ void EmpowerQueueInfoBase::process_packet_deficit(int dscp, int deficit) {
                       dscp,
                       deficit);
     }
+
+    DSCPDeficitPacketsMap :: Pair * crr_dscp_deficit_pkts_pair = dscp_deficit_pkts_map.find_pair(dscp);
+
+    // if DSCP exists in deficit packets map
+    if (crr_dscp_deficit_pkts_pair){
+        if (_debug){
+            click_chatter("%{element} :: %s :: Deficit packets vector size is: %d",
+                          this,
+                          __func__,
+                          crr_dscp_deficit_pkts_pair->value.size());
+        }
+
+        // Include packet timestamp at the end of the vector
+        crr_dscp_deficit_pkts_pair->value.push_back(deficit);
+
+    } else {
+        if (_debug){
+            click_chatter("%{element} :: %s :: Initializing Deficit vector for DSCP: %d",
+                          this,
+                          __func__,
+                          dscp);
+        }
+
+        // Create vector for packet deficits
+        Vector<int> deficit_pkts_vector;
+
+        // Inserting current deficit into it
+        deficit_pkts_vector.push_back(deficit);
+
+        // Inserting the vector of deficits into DSCP hashmap
+        dscp_deficit_packets_map.insert(dscp, deficit_pkts_vector);
+    }
+
 }
 
 int EmpowerQueueInfoBase::get_deficit(int dscp) {
@@ -122,7 +180,7 @@ void EmpowerQueueInfoBase::process_packet_enqueue(int dscp, Timestamp timestamp)
 
     } else {
         if (_debug){
-            click_chatter("%{element} :: %s :: Initializing vector for DSCP: %d",
+            click_chatter("%{element} :: %s :: Initializing Timestamp vector for DSCP: %d",
                           this,
                           __func__,
                           dscp);
