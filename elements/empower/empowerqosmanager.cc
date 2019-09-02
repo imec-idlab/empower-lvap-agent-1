@@ -321,7 +321,7 @@ Packet * EmpowerQOSManager::pull(int) {
 
 
         // Process packet dequeue (@PHI)
-        _el_queue_info->process_packet_airtime(queue->_slice._dscp, deficit);
+        _el_queue_info->process_packet_deficit(queue->_slice._dscp, deficit);
 
         // Getting the current average deficit for the slice (@PHI)
         queue->_deficit = _el_queue_info->get_deficit(queue->_slice._dscp).msec();
