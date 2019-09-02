@@ -74,6 +74,28 @@ void EmpowerQueueInfoBase::run_timer(Timer *){
     _timer.schedule_after_msec(_period);
 }
 
+void EmpowerQueueInfoBase::process_packet_deficit(int dscp, int deficit) {
+
+    if (_debug) {
+        click_chatter("%{element} :: %s :: process packet Deficit for DSCP: %d and Deficit: %d!",
+                      this,
+                      __func__,
+                      dscp,
+                      deficit);
+    }
+}
+
+int EmpowerQueueInfoBase::get_deficit(int dscp) {
+    // Getting the average deficit from the map..
+    DSCPDeficitMap :: Pair * crr_dscp_deficit_pair = dscp_deficit_map.find_pair(dscp);
+
+    if (crr_dscp_deficit_pair){
+        return crr_dscp_deficit_pair->value;
+    } else {
+        return 0; // Returns empty deficit
+    }
+}
+
 void EmpowerQueueInfoBase::process_packet_enqueue(int dscp, Timestamp timestamp){
 
     if (_debug){

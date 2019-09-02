@@ -860,6 +860,7 @@ struct empower_slice_queue_counters_response : public empower_header {
     uint32_t	_tx_packets;        /* Int */
     uint32_t	_tx_bytes;          /* Int */
     uint32_t	_queue_delay;       /* Int */
+    uint32_t	_deficit_avg;       /* Int */
   public:
     void set_wtp(EtherAddress wtp)                          { memcpy(_wtp, wtp.data(), 6); }
     void set_counters_id(uint32_t counters_id)              { _counters_id = htonl(counters_id); }
@@ -868,6 +869,7 @@ struct empower_slice_queue_counters_response : public empower_header {
     void set_tx_packets(uint32_t tx_packets)    			{ _tx_packets = htonl(tx_packets); }
     void set_tx_bytes(uint32_t tx_bytes)    				{ _tx_bytes = htonl(tx_bytes); }
     void set_queue_delay(uint32_t queue_delay)    			{ _queue_delay = htonl(queue_delay); }
+    void set_deficit_avg(uint32_t deficit_avg)    			{ _deficit_avg = htonl(deficit_avg); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 CLICK_ENDDECLS

@@ -43,6 +43,12 @@ typedef HashMap<int, Vector<Timestamp> > DSCPDelayPacketsMap;
 // Key: DSCP value (int)
 typedef HashMap<int, Timestamp> DSCPQueueDelayMap;
 
+// Key: DSCP value (int)
+typedef HashMap<int, Vector<int> > DSCPDeficitPacketsMap;
+
+// Key: DSCP value (int)
+typedef HashMap<int, int> DSCPDeficitMap;
+
 class EmpowerQueueInfoBase : public Element {
 public:
 
@@ -62,8 +68,14 @@ public:
     // DSCP (int) and timestamp (int)
     void process_packet_dequeue(int, Timestamp);
 
+    // DSCP (int) and deficit (int)
+    void process_packet_deficit(int, int);
+
     // DSCP (int) returns the queue delay in Timestamp format
     Timestamp get_queue_delay(int);
+
+    // DSCP (int) returns the deficit in int format
+    int get_deficit(int);
 
     void add_handlers();
 
@@ -93,6 +105,11 @@ private:
      * Structure for holding last transmitted packet delays per DSCP (Slice)
      */
     DSCPDelayPacketsMap dscp_delay_packets_map;
+
+    /*
+     * Structure for holding last Deficits needed to transmit per DSCP (Slice)
+     */
+    DSCPDeficitMap dscp_deficit_map;
 
     static int write_handler(const String &, Element *, void *, ErrorHandler *);
     static String read_handler(Element *, void *);
