@@ -871,7 +871,7 @@ struct empower_slice_queue_counters_response : public empower_header {
     void set_tx_bytes(uint32_t tx_bytes)    				{ _tx_bytes = htonl(tx_bytes); }
     void set_queue_delay(uint32_t queue_delay)    			{ _queue_delay = htonl(queue_delay); }
     void set_deficit_avg(uint32_t deficit_avg)    			{ _deficit_avg = htonl(deficit_avg); }
-    void set_deficit(uint32_t deficit)    			{ _deficit_avg = htonl(deficit); }
+    void set_deficit(uint32_t deficit)    			        { _deficit = htonl(deficit); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 CLICK_ENDDECLS
