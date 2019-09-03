@@ -166,10 +166,6 @@ EmpowerQOSManager::push(int, Packet *p) {
 																 iface_id);
 			}
 
-            // Process packet enqueue for multicast (@PHI)
-            _el_queue_info->process_packet_enqueue(dscp, Timestamp::now());
-            // end(@PHI)
-
 			_el->send_incoming_mcast_address(dst, iface_id);
 		}
 
