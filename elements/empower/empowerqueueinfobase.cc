@@ -132,7 +132,7 @@ void EmpowerQueueInfoBase::process_packet_deficit(int dscp, int deficit) {
         }
 
         // Create vector for packet deficits
-        Vector<int> deficit_pkts_vector;
+        Vector<uint32_t> deficit_pkts_vector;
 
         // Inserting current deficit into it
         deficit_pkts_vector.push_back(deficit);
