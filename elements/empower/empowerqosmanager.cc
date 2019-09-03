@@ -325,15 +325,6 @@ Packet * EmpowerQOSManager::pull(int) {
         // Getting the current average deficit for the slice (@PHI)
         queue->_deficit_avg = _el_queue_info->get_deficit(queue->_slice._dscp);
 
-        if (_debug) {
-            click_chatter("%{element} :: %s :: DSCP %u, queue_delay %u deficit_avg %u",
-                          this,
-                          __func__,
-                          slice._dscp,
-                          queue->_queue_delay,
-                          queue->_deficit_avg);
-        }
-
         if (queue->size() > 0) {
 			_active_list.push_front(slice);
 		}
