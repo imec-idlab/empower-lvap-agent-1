@@ -271,7 +271,11 @@ void EmpowerQueueInfoBase::process_packet_dequeue(int dscp, Timestamp timestamp)
             // Remove first timestamp from the vector
             crr_dscp_timstamp_enqueued_pkts_pair->value.pop_front();
         } else {
-            click_chatter("%{element} :: %s :: error: skipping packet DEqueue because timestamp vector is empty or not valid!", this, __func__);
+            if (_debug) {
+                click_chatter(
+                        "%{element} :: %s :: error: skipping packet DEqueue because timestamp vector is empty or not valid!",
+                        this, __func__);
+            }
         }
     } else {
         if (_debug){
