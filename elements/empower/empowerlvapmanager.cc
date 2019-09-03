@@ -472,6 +472,7 @@ void EmpowerLVAPManager::send_slice_queue_counters_response(uint32_t counters_id
     counters->set_tx_packets(queue->_tx_packets);
     counters->set_queue_delay(queue->_queue_delay);
     counters->set_deficit_avg(queue->_deficit_avg);
+    counters->set_deficit(queue->_deficit);
 
     send_message(p);
 
