@@ -237,7 +237,7 @@ public:
     uint32_t _tx_packets;
     uint32_t _tx_bytes;
     uint32_t _scheduler;
-    uint32_t _queue_delay; // in msec
+    uint32_t _queue_delay; // in usec
     uint32_t _deficit_avg;
 
     SliceQueue(Slice slice, uint32_t capacity, uint32_t quantum, bool amsdu_aggregation, uint32_t scheduler) :
