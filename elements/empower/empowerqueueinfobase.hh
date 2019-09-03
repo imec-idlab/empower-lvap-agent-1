@@ -44,10 +44,10 @@ typedef HashMap<int, Vector<Timestamp> > DSCPDelayPacketsMap;
 typedef HashMap<int, Timestamp> DSCPQueueDelayMap;
 
 // Key: DSCP value (int)
-typedef HashMap<int, Vector<int> > DSCPDeficitPacketsMap;
+typedef HashMap<int, Vector<uint32_t> > DSCPDeficitPacketsMap;
 
 // Key: DSCP value (int)
-typedef HashMap<int, int> DSCPDeficitMap;
+typedef HashMap<int, uint32_t> DSCPDeficitMap;
 
 class EmpowerQueueInfoBase : public Element {
 public:
@@ -74,8 +74,8 @@ public:
     // DSCP (int) returns the queue delay in Timestamp format
     Timestamp get_queue_delay(int);
 
-    // DSCP (int) returns the deficit in int format
-    int get_deficit(int);
+    // DSCP (int) returns the deficit in uint32_t format
+    uint32_t get_deficit(int);
 
     void add_handlers();
 

@@ -74,8 +74,8 @@ void EmpowerQueueInfoBase::run_timer(Timer *){
     // Computing the average deficit
     for (DSCPDeficitPacketsMap::iterator i = dscp_deficit_packets_map.begin(); i!= dscp_deficit_packets_map.end(); i++) {
 
-        int sum = 0;
-        int avg = 0;
+        uint32_t sum = 0;
+        uint32_t avg = 0;
 
         // Iterate over the vector of computed delays
         for (Vector<int>::const_iterator j = i.value().begin(); j!= i.value().end(); j++) {
@@ -143,7 +143,7 @@ void EmpowerQueueInfoBase::process_packet_deficit(int dscp, int deficit) {
 
 }
 
-int EmpowerQueueInfoBase::get_deficit(int dscp) {
+uint32_t EmpowerQueueInfoBase::get_deficit(int dscp) {
     // Getting the average deficit from the map..
     DSCPDeficitMap :: Pair * crr_dscp_deficit_pair = dscp_deficit_map.find_pair(dscp);
 
