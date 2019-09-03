@@ -77,8 +77,8 @@ void EmpowerQueueInfoBase::run_timer(Timer *){
         uint32_t sum = 0;
         uint32_t avg = 0;
 
-        // Iterate over the vector of computed delays
-        for (Vector<int>::const_iterator j = i.value().begin(); j!= i.value().end(); j++) {
+        // Iterate over the vector of computed deficits
+        for (Vector<uint32_t>::const_iterator j = i.value().begin(); j!= i.value().end(); j++) {
             sum += *j;
         }
 
