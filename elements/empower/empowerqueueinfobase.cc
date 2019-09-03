@@ -24,15 +24,19 @@ CLICK_DECLS
 
 
 EmpowerQueueInfoBase::EmpowerQueueInfoBase() :
-        _el(0), _timer(this), _period(500), _debug(false) {
+        _el(0), _timer(this), _period_timer_queue_delay(500), _period_timer_deficit(500), _debug(false) {
 }
 
 EmpowerQueueInfoBase::~EmpowerQueueInfoBase() {
 }
 
 int EmpowerQueueInfoBase::initialize(ErrorHandler *) {
-    _timer.initialize(this);
-    _timer.schedule_now();
+
+    _timer_queue_delay.initialize(this);
+    _timer_deficit.initialize(this);
+
+    _timer_queue_delay.schedule_now();
+    _timer_deficit.schedule_now();
     return 0;
 }
 
@@ -44,7 +48,7 @@ int EmpowerQueueInfoBase::configure(Vector<String> &conf,
             .complete();
 }
 
-void EmpowerQueueInfoBase::run_timer(Timer *){
+void EmpowerQueueInfoBase::run_timer_queue_delay(Timer *) {
 
     // Computing the average queue delay
     for (DSCPDelayPacketsMap::iterator i = dscp_delay_packets_map.begin(); i!= dscp_delay_packets_map.end(); i++) {
@@ -71,6 +75,10 @@ void EmpowerQueueInfoBase::run_timer(Timer *){
         i.value().clear();
     }
 
+    _timer_queue_delay.schedule_after_msec(_period_timer_queue_delay);
+}
+
+void EmpowerQueueInfoBase::run_timer_deficit(Timer *) {
     // Computing the average deficit
     for (DSCPDeficitPacketsMap::iterator i = dscp_deficit_packets_map.begin(); i!= dscp_deficit_packets_map.end(); i++) {
 
@@ -96,7 +104,7 @@ void EmpowerQueueInfoBase::run_timer(Timer *){
         i.value().clear();
     }
 
-    _timer.schedule_after_msec(_period);
+    _timer_deficit.schedule_after_msec(_period_timer_deficit);
 }
 
 void EmpowerQueueInfoBase::process_packet_deficit(int dscp, int deficit) {
