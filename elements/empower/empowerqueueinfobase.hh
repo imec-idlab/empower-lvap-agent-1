@@ -79,9 +79,7 @@ public:
 
     void add_handlers();
 
-    void run_timer_queue_delay(Timer *);
-
-    void run_timer_deficit(Timer *);
+    void run_timer(Timer *);
 
 private:
 
@@ -89,13 +87,9 @@ private:
 
     bool _debug;
 
-    int _period_timer_queue_delay;
+    int _period;
 
-    int _period_timer_deficit;
-
-    Timer _timer_queue_delay;
-
-    Timer _timer_deficit;
+    Timer _timer;
 
     /*
      * Structure for holding the last TX packets timestamp according to its DSCP values
