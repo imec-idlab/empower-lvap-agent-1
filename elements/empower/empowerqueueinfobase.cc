@@ -40,6 +40,7 @@ int EmpowerQueueInfoBase::configure(Vector<String> &conf,
                                   ErrorHandler *errh) {
     return Args(conf, this, errh)
             .read_m("EL", ElementCastArg("EmpowerLVAPManager"), _el)
+            .read("PERIOD", _period)
             .read("DEBUG", _debug)
             .complete();
 }
@@ -280,7 +281,8 @@ void EmpowerQueueInfoBase::process_packet_dequeue(int dscp, Timestamp timestamp)
 }
 
 enum {
-    H_DEBUG
+    H_DEBUG,
+    H_PERIOD
 };
 
 String EmpowerQueueInfoBase::read_handler(Element *e, void *thunk) {
@@ -288,6 +290,8 @@ String EmpowerQueueInfoBase::read_handler(Element *e, void *thunk) {
     switch ((uintptr_t) thunk) {
         case H_DEBUG:
             return String(td->_debug) + "\n";
+        case H_PERIOD:
+            return String(td->_period) + "\n";
         default:
             return String();
     }
@@ -307,6 +311,15 @@ int EmpowerQueueInfoBase::write_handler(const String &in_s, Element *e,
             f->_debug = debug;
             break;
         }
+        case H_PERIOD: {
+            int period;
+            if (!IntArg().parse(s, period))
+                return errh->error("period parameter must integer");
+            if (period > 100)
+                return errh->error("period parameter has to be bigger than 100 usec");
+            f->_period = period;
+            break;
+        }
     }
     return 0;
 }
@@ -314,6 +327,8 @@ int EmpowerQueueInfoBase::write_handler(const String &in_s, Element *e,
 void EmpowerQueueInfoBase::add_handlers() {
     add_read_handler("debug", read_handler, (void *) H_DEBUG);
     add_write_handler("debug", write_handler, (void *) H_DEBUG);
+    add_read_handler("period", read_handler, (void *) H_PERIOD);
+    add_write_handler("period", write_handler, (void *) H_PERIOD);
 }
 
 CLICK_ENDDECLS

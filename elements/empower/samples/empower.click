@@ -15,7 +15,7 @@ ControlSocket("TCP", 7777);
 
 ers :: EmpowerRXStats(EL el);
 
-el_empower_queue_info_base :: EmpowerQueueInfoBase(EL el, DEBUG false)
+el_empower_queue_info_base :: EmpowerQueueInfoBase(EL el, PERIOD 1000, DEBUG false)
 
 wifi_cl :: Classifier(0/08%0c,  // data
                       0/00%0c); // mgt

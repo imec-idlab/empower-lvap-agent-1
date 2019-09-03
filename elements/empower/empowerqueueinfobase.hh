@@ -87,7 +87,7 @@ private:
 
     bool _debug;
 
-    int _period;
+    unsigned int _period;
 
     Timer _timer;
 
