@@ -319,12 +319,11 @@ Packet * EmpowerQOSManager::pull(int) {
 		// Getting the current average delay for the slice (@PHI)
         queue->_queue_delay = _el_queue_info->get_queue_delay(queue->_slice._dscp).msec();
 
-
         // Process packet dequeue (@PHI)
         _el_queue_info->process_packet_deficit(queue->_slice._dscp, deficit);
 
         // Getting the current average deficit for the slice (@PHI)
-        queue->_deficit = _el_queue_info->get_deficit(queue->_slice._dscp);
+        queue->_deficit_avg = _el_queue_info->get_deficit(queue->_slice._dscp);
 
         if (queue->size() > 0) {
 			_active_list.push_front(slice);
