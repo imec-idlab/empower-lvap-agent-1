@@ -24,7 +24,10 @@ CLICK_DECLS
 
 
 EmpowerQueueInfoBase::EmpowerQueueInfoBase() :
-        _el(0), _timer(this), _period_timer_queue_delay(500), _period_timer_deficit(500), _debug(false) {
+        _el(0),
+        _timer_queue_delay(this), _timer_deficit(this),
+        _period_timer_queue_delay(500), _period_timer_deficit(500),
+        _debug(false) {
 }
 
 EmpowerQueueInfoBase::~EmpowerQueueInfoBase() {
