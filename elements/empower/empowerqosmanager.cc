@@ -314,6 +314,11 @@ Packet * EmpowerQOSManager::pull(int) {
 		queue->_tx_bytes += p->length();
 		queue->_tx_packets++;
 
+        click_chatter("%{element} :: %s :: crr_queue_length: %d ",
+                      this,
+                      __func__,
+                      queue->_crr_queue_length);
+
 		// Process packet dequeue (@PHI)
 		_el_queue_info->process_packet_dequeue(queue->_slice._dscp, Timestamp::now());
 

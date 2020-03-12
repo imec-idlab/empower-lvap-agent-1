@@ -467,6 +467,7 @@ void EmpowerLVAPManager::send_slice_queue_counters_response(uint32_t counters_id
     counters->set_counters_id(counters_id);
     counters->set_wtp(_wtp);
     counters->set_max_queue_length(queue->_max_queue_length);
+    counters->set_crr_queue_length(queue->_crr_queue_length);
     counters->set_deficit_used(queue->_deficit_used);
     counters->set_tx_bytes(queue->_tx_bytes);
     counters->set_tx_packets(queue->_tx_packets);
