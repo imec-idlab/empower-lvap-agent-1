@@ -111,127 +111,128 @@ EmpowerQOSManager::push(int, Packet *p) {
 		return;
 	}
 
-	if (_rc->tx_policies()->lookup(dst)->_tx_mcast == TX_MCAST_DMS) {
-
-		/*
-		 * DMS mcast policy. Duplicate the frame for each station in the mcast group
-		 * and use unicast destination addresses.
-		 */
-
-		Vector<EtherAddress> *mcast_receivers = _el->get_mcast_receivers(dst);
-
-		if (!mcast_receivers) {
-			p->kill();
-			return;
-		}
-
-		Vector<EtherAddress>::iterator itr;
-		for (itr = mcast_receivers->begin(); itr != mcast_receivers->end(); itr++) {
-			EmpowerStationState * ess = _el->lvaps()->get_pointer(*itr);
-			if (!ess) {
-				continue;
-			}
-			_el->lock()->acquire_read();
-			if (!ess->is_valid(iface_id)){
-				continue;
-			} else {
-				Packet *q = p->clone();
-				if (!q) {
-					continue;
-				}
-				store(ess->_ssid, dscp, q, *itr, ess->_bssid);
-			}
-			_el->lock()->release_read();
-		}
-
-	} else {
-
-		/*
-		 * Legacy mcast policy. Frames must still be duplicated for unique tenants
-		 * since the lvap model does not support broadcasting. After frames must be
-		 * send also to the shared tenants.
-		 *
-		 * Notice that here we can have both mcast and bcast address.
-		 */
-
-		TxPolicyInfo *mcast_tx_policy = _rc->tx_policies()->supported(dst);
-
-		// Mcast address unknown, report to the controller
-		if (!dst.is_broadcast() && dst.is_group() && !mcast_tx_policy) {
-			if (_debug){
-				click_chatter("%{element} :: %s :: Missing transmission policy for multicast address %s on interface %d. Sending request to the controller.",
-																 this,
-																 __func__,
-																 dst.unparse().c_str(),
-																 iface_id);
-			}
-
-			_el->send_incoming_mcast_address(dst, iface_id);
-		}
-
-		if (mcast_tx_policy) {
-
-			/* If there is a transmission policy, it means that destination is a multicast address
-			 * and the policy is set to legacy, so frames must be sent just to the bssids of the
-			 * multicast receptors that subscribed that multicast group.
-			 */
-
-			Vector<EtherAddress> *mcast_receivers = _el->get_mcast_receivers(dst);
-
-			if (!mcast_receivers) {
-				p->kill();
-				return;
-			}
-
-			if (mcast_receivers->size() == 0) {
-				p->kill();
-				return;
-			}
-
-			EtherAddress sta = mcast_receivers->front();
-			EmpowerStationState *first = _el->lvaps()->get_pointer(sta);
-
-			if (!first) {
-				p->kill();
-				return;
-			}
-
-			Packet *q = p->clone();
-			store(first->_ssid, dscp, q, dst, first->_bssid);
-
-		} else {
-
-			/* If there is no transmission policy for the multicast address or it is a broadcast
-			 * destination, all of the lvaps and vaps have to receive it.
-			 */
-
-			// handle unique LVAPs
-			_el->lock()->acquire_read();
-			for (LVAPIter it = _el->lvaps()->begin(); it.live(); it++) {
-				if (!it.value().is_valid(iface_id)) {
-					continue;
-				}
-				if (!_el->is_unique_lvap(it.value()._sta)) {
-					continue;
-				}
-				Packet *q = p->clone();
-				if (!q) {
-					continue;
-				}
-				store(it.value()._ssid, dscp, q, it.value()._sta, it.value()._bssid);
-			}
-			_el->lock()->release_read();
-
-			// handle VAPs
-			for (VAPIter it = _el->vaps()->begin(); it.live(); it++) {
-				if (it.value()._iface_id != iface_id) {
-					continue;
-				}
-				Packet *q = p->clone();
-				store(it.value()._ssid, dscp, q, dst, it.value()._bssid);
-			}
-		}
-	}
+	// PHI: comment multicast if a problem with it
+//	if (_rc->tx_policies()->lookup(dst)->_tx_mcast == TX_MCAST_DMS) {
+//
+//		/*
+//		 * DMS mcast policy. Duplicate the frame for each station in the mcast group
+//		 * and use unicast destination addresses.
+//		 */
+//
+//		Vector<EtherAddress> *mcast_receivers = _el->get_mcast_receivers(dst);
+//
+//		if (!mcast_receivers) {
+//			p->kill();
+//			return;
+//		}
+//
+//		Vector<EtherAddress>::iterator itr;
+//		for (itr = mcast_receivers->begin(); itr != mcast_receivers->end(); itr++) {
+//			EmpowerStationState * ess = _el->lvaps()->get_pointer(*itr);
+//			if (!ess) {
+//				continue;
+//			}
+//			_el->lock()->acquire_read();
+//			if (!ess->is_valid(iface_id)){
+//				continue;
+//			} else {
+//				Packet *q = p->clone();
+//				if (!q) {
+//					continue;
+//				}
+//				store(ess->_ssid, dscp, q, *itr, ess->_bssid);
+//			}
+//			_el->lock()->release_read();
+//		}
+//
+//	} else {
+//
+//		/*
+//		 * Legacy mcast policy. Frames must still be duplicated for unique tenants
+//		 * since the lvap model does not support broadcasting. After frames must be
+//		 * send also to the shared tenants.
+//		 *
+//		 * Notice that here we can have both mcast and bcast address.
+//		 */
+//
+//		TxPolicyInfo *mcast_tx_policy = _rc->tx_policies()->supported(dst);
+//
+//		// Mcast address unknown, report to the controller
+//		if (!dst.is_broadcast() && dst.is_group() && !mcast_tx_policy) {
+//			if (_debug){
+//				click_chatter("%{element} :: %s :: Missing transmission policy for multicast address %s on interface %d. Sending request to the controller.",
+//																 this,
+//																 __func__,
+//																 dst.unparse().c_str(),
+//																 iface_id);
+//			}
+//
+//			_el->send_incoming_mcast_address(dst, iface_id);
+//		}
+//
+//		if (mcast_tx_policy) {
+//
+//			/* If there is a transmission policy, it means that destination is a multicast address
+//			 * and the policy is set to legacy, so frames must be sent just to the bssids of the
+//			 * multicast receptors that subscribed that multicast group.
+//			 */
+//
+//			Vector<EtherAddress> *mcast_receivers = _el->get_mcast_receivers(dst);
+//
+//			if (!mcast_receivers) {
+//				p->kill();
+//				return;
+//			}
+//
+//			if (mcast_receivers->size() == 0) {
+//				p->kill();
+//				return;
+//			}
+//
+//			EtherAddress sta = mcast_receivers->front();
+//			EmpowerStationState *first = _el->lvaps()->get_pointer(sta);
+//
+//			if (!first) {
+//				p->kill();
+//				return;
+//			}
+//
+//			Packet *q = p->clone();
+//			store(first->_ssid, dscp, q, dst, first->_bssid);
+//
+//		} else {
+//
+//			/* If there is no transmission policy for the multicast address or it is a broadcast
+//			 * destination, all of the lvaps and vaps have to receive it.
+//			 */
+//
+//			// handle unique LVAPs
+//			_el->lock()->acquire_read();
+//			for (LVAPIter it = _el->lvaps()->begin(); it.live(); it++) {
+//				if (!it.value().is_valid(iface_id)) {
+//					continue;
+//				}
+//				if (!_el->is_unique_lvap(it.value()._sta)) {
+//					continue;
+//				}
+//				Packet *q = p->clone();
+//				if (!q) {
+//					continue;
+//				}
+//				store(it.value()._ssid, dscp, q, it.value()._sta, it.value()._bssid);
+//			}
+//			_el->lock()->release_read();
+//
+//			// handle VAPs
+//			for (VAPIter it = _el->vaps()->begin(); it.live(); it++) {
+//				if (it.value()._iface_id != iface_id) {
+//					continue;
+//				}
+//				Packet *q = p->clone();
+//				store(it.value()._ssid, dscp, q, dst, it.value()._bssid);
+//			}
+//		}
+//	}
 
 	p->kill();
 	return;
@@ -318,7 +319,8 @@ Packet * EmpowerQOSManager::pull(int) {
 		_el_queue_info->process_packet_dequeue(queue->_slice._dscp, Timestamp::now());
 
 		// Getting the current average delay for the slice (@PHI)
-        queue->_queue_delay = _el_queue_info->get_queue_delay(queue->_slice._dscp).usec();
+        queue->_queue_delay_sec = _el_queue_info->get_queue_delay(queue->_slice._dscp).sec();
+        queue->_queue_delay_usec = _el_queue_info->get_queue_delay(queue->_slice._dscp).usec();
 
         // Process packet dequeue (@PHI)
         _el_queue_info->process_packet_deficit(queue->_slice._dscp, deficit);

@@ -860,7 +860,8 @@ struct empower_slice_queue_counters_response : public empower_header {
     uint32_t    _crr_queue_length;  /* Current queue length */
     uint32_t	_tx_packets;        /* Int */
     uint32_t	_tx_bytes;          /* Int */
-    uint32_t	_queue_delay;       /* Int */
+    uint32_t	_queue_delay_sec;   /* Int */
+    uint32_t	_queue_delay_usec;  /* Int */
     uint32_t	_deficit_avg;       /* Int */
     uint32_t	_deficit;           /* Int */
   public:
@@ -871,7 +872,8 @@ struct empower_slice_queue_counters_response : public empower_header {
     void set_crr_queue_length(uint32_t crr_queue_length)    { _crr_queue_length = htonl(crr_queue_length); }
     void set_tx_packets(uint32_t tx_packets)    			{ _tx_packets = htonl(tx_packets); }
     void set_tx_bytes(uint32_t tx_bytes)    				{ _tx_bytes = htonl(tx_bytes); }
-    void set_queue_delay(uint32_t queue_delay)    			{ _queue_delay = htonl(queue_delay); }
+    void set_queue_delay_sec(uint32_t queue_delay_sec)    	{ _queue_delay_sec = htonl(queue_delay_sec); }
+    void set_queue_delay_usec(uint32_t queue_delay_usec)    { _queue_delay_usec = htonl(queue_delay_usec); }
     void set_deficit_avg(uint32_t deficit_avg)    			{ _deficit_avg = htonl(deficit_avg); }
     void set_deficit(uint32_t deficit)    			        { _deficit = htonl(deficit); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
