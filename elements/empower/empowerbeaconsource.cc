@@ -60,14 +60,8 @@ void EmpowerBeaconSource::run_timer(Timer *) {
 			EtherAddress bssid = it.value()._networks[i]._bssid;
 			String ssid = it.value()._networks[i]._ssid;
 			if (it.value()._bssid == bssid && it.value()._ssid == ssid && it.value()._csa_active) {
-                click_chatter("%{element} :: %s :: sending CSA beacon",
-                              this,
-                              __func__);
 				send_lvap_csa_beacon(&it.value());
 			} else {
-                click_chatter("%{element} :: %s :: sending normal beacon",
-                              this,
-                              __func__);
 				send_beacon(it.value()._sta, bssid, ssid, it.value()._channel, it.value()._iface_id, false, false, 0, 0, 0);
 			}
 		}
